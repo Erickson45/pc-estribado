@@ -1,0 +1,11 @@
+# gerado pelo PyInstaller / Inno Setup
+build/
+dist/
+instalador/
+*.spec
+
+# gerado pelo gerar_icone.py
+icone_1024.png
+
+__pycache__/
+*.pyc
