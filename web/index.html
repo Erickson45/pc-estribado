@@ -1,0 +1,1481 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PC Estribado</title>
+<style>
+:root {
+  --bg: #0b0f15;
+  --painel: #131922;
+  --painel2: #18202b;
+  --hover: #1e2835;
+  --borda: #232d3b;
+  --texto: #e7edf4;
+  --suave: #8a97a8;
+  --apagado: #5c6878;
+  --acento: #38d9a9;
+  --acento-escuro: #0f3d33;
+  --azul: #5b9cff;
+  --roxo: #a98bff;
+  --aviso: #f5b84a;
+  --perigo: #ff6b6b;
+  --raio: 14px;
+}
+* { box-sizing: border-box; margin: 0; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--texto);
+  font: 14px/1.5 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  display: grid; grid-template-columns: 232px 1fr; overflow: hidden;
+  -webkit-font-smoothing: antialiased; user-select: none;
+}
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+button:disabled { cursor: not-allowed; opacity: .45; }
+select, input[type=time] { font: inherit; color: var(--texto); background: var(--painel2); border: 1px solid var(--borda); border-radius: 8px; padding: 7px 10px; color-scheme: dark; }
+svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* ---------- Lateral ---------- */
+.lateral { background: var(--painel); border-right: 1px solid var(--borda); display: flex; flex-direction: column; padding: 20px 14px; }
+.marca { display: flex; align-items: center; gap: 12px; padding: 4px 8px 26px; }
+.logo { width: 46px; height: 46px; flex: none; filter: drop-shadow(0 6px 14px rgba(56,217,169,.35)); }
+.marca b { font-size: 17px; letter-spacing: -.2px; display: block; }
+.marca small { color: var(--suave); font-size: 12px; }
+nav { display: flex; flex-direction: column; gap: 4px; }
+nav button { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 10px; color: var(--suave); text-align: left; font-weight: 500; transition: .15s; }
+nav button:hover { background: var(--hover); color: var(--texto); }
+nav button.ativo { background: var(--acento-escuro); color: var(--acento); }
+.rodape-lateral { margin-top: auto; padding: 12px; border-radius: 10px; background: var(--painel2); font-size: 12px; color: var(--suave); }
+.rodape-lateral b { color: var(--texto); font-weight: 600; display: block; font-size: 13px; }
+.selo { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-weight: 600; }
+.selo::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.selo.ok { color: var(--acento); } .selo.ruim { color: var(--aviso); }
+
+/* ---------- Conteúdo ---------- */
+main { display: flex; flex-direction: column; min-width: 0; height: 100vh; }
+.conteudo { flex: 1; overflow-y: auto; padding: 30px 36px 40px; }
+.conteudo::-webkit-scrollbar, pre::-webkit-scrollbar { width: 10px; }
+.conteudo::-webkit-scrollbar-thumb, pre::-webkit-scrollbar-thumb { background: var(--borda); border-radius: 10px; border: 3px solid var(--bg); }
+.pagina { display: none; max-width: 1080px; animation: entra .25s ease; }
+.pagina.ativa { display: block; }
+@keyframes entra { from { opacity: 0; transform: translateY(6px); } }
+.topo { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+h1 { font-size: 26px; font-weight: 650; letter-spacing: -.4px; }
+.sub { color: var(--suave); margin-top: 2px; }
+h2 { font-size: 15px; font-weight: 600; }
+h3 { font-size: 12px; font-weight: 600; color: var(--suave); text-transform: uppercase; letter-spacing: .6px; margin: 26px 0 10px; }
+.acoes { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 10px; font-weight: 600; transition: .15s; white-space: nowrap; }
+.btn svg.i { width: 18px; height: 18px; }
+.btn.primario { background: var(--acento); color: #04231b; }
+.btn.primario:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+.btn.sec { background: var(--painel2); border: 1px solid var(--borda); }
+.btn.sec:hover:not(:disabled) { background: var(--hover); }
+.btn.peq { padding: 6px 12px; font-size: 13px; border-radius: 8px; }
+.btn.aviso { background: rgba(245,184,74,.14); color: var(--aviso); }
+.btn.perigo { background: rgba(255,107,107,.14); color: var(--perigo); }
+.link { color: var(--azul); font-weight: 500; }
+.link:hover { text-decoration: underline; }
+
+.card { background: var(--painel); border: 1px solid var(--borda); border-radius: var(--raio); }
+.faixa { display: flex; gap: 12px; align-items: center; padding: 12px 16px; border-radius: 12px; margin-bottom: 18px;
+  background: rgba(245,184,74,.1); border: 1px solid rgba(245,184,74,.3); color: var(--aviso); }
+.faixa > span { color: var(--texto); flex: 1; }
+.faixa.azul { background: rgba(91,156,255,.1); border-color: rgba(91,156,255,.3); color: var(--azul); }
+.faixa.verde { background: linear-gradient(90deg, rgba(56,217,169,.16), rgba(91,156,255,.12)); border-color: rgba(56,217,169,.35); color: var(--acento); }
+.rodape-lateral { cursor: pointer; transition: background .15s; }
+.rodape-lateral:hover { background: var(--hover); }
+.ponto-novo { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--acento); margin-left: 6px; box-shadow: 0 0 0 3px rgba(56,217,169,.2); }
+.sobre-topo { padding: 28px; display: flex; gap: 22px; align-items: center;
+  background: radial-gradient(120% 160% at 0% 0%, rgba(56,217,169,.14), transparent 60%), var(--painel); }
+.sobre-topo img { width: 96px; height: 96px; filter: drop-shadow(0 10px 20px rgba(56,217,169,.3)); }
+.notas { padding: 4px 18px 16px 18px; color: var(--suave); font-size: 13px; white-space: pre-wrap; user-select: text; max-height: 220px; overflow-y: auto; }
+
+/* ---------- Anéis e barras ---------- */
+.anel { position: relative; flex: none; }
+.anel svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.anel circle { fill: none; stroke-linecap: round; }
+.anel .trilho { stroke: var(--painel2); }
+.anel .valor { transition: stroke-dasharray .8s ease, stroke .3s; }
+.anel > div { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.anel b { line-height: 1; font-variant-numeric: tabular-nums; }
+.anel small { color: var(--suave); font-size: 11px; }
+.barrinha { height: 8px; border-radius: 99px; background: var(--painel2); overflow: hidden; }
+.barrinha div { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--acento), var(--azul)); transition: width .6s ease; }
+
+/* ---------- Início ---------- */
+.inicio-grade { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; margin-bottom: 16px; }
+.nota { padding: 22px; display: flex; gap: 22px; }
+.nota-esq { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; width: 150px; flex: none; }
+.nota-esq .rotulo { font-weight: 650; font-size: 15px; }
+.nota-esq p { color: var(--suave); font-size: 12.5px; }
+.checklist { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.chk { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 8px; font-size: 13px; }
+.chk:hover { background: var(--painel2); }
+.chk .bola { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; flex: none; font-size: 12px; font-weight: 800; }
+.chk.ok .bola { background: rgba(56,217,169,.16); color: var(--acento); }
+.chk.ruim .bola { background: rgba(245,184,74,.16); color: var(--aviso); }
+.chk .txt { flex: 1; min-width: 0; }
+.chk .txt small { color: var(--suave); display: block; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chk .btn { padding: 4px 10px; font-size: 12px; }
+.ao-vivo { padding: 22px; display: flex; flex-direction: column; gap: 18px; }
+.medidores { display: flex; gap: 22px; justify-content: space-around; }
+.medidor { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.medidor .nome { font-weight: 600; }
+.medidor small { color: var(--suave); font-size: 12px; }
+.disco-linha { display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: center; font-size: 13px; }
+.disco-linha span:last-child { color: var(--suave); font-variant-numeric: tabular-nums; }
+.hw-grade { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.hw { padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start; min-width: 0; }
+.hw .ic { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; flex: none; }
+.hw .txt { min-width: 0; }
+.hw small { color: var(--suave); font-size: 12px; text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+.hw b { display: block; font-weight: 600; margin: 2px 0; }
+.hw p { color: var(--suave); font-size: 12.5px; }
+.esqueleto { background: linear-gradient(90deg, var(--painel2), var(--hover), var(--painel2)); background-size: 200% 100%; animation: brilha 1.4s infinite; border-radius: 6px; height: 14px; margin: 6px 0; }
+@keyframes brilha { to { background-position: -200% 0; } }
+.processos { padding: 18px 20px; }
+.proc { display: grid; grid-template-columns: 170px 1fr 80px; gap: 14px; align-items: center; font-size: 13px; padding: 5px 0; }
+.proc span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.proc span:last-child { text-align: right; color: var(--suave); font-variant-numeric: tabular-nums; }
+.rapidas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.atalho { padding: 16px; text-align: left; transition: .15s; display: flex; flex-direction: column; gap: 8px; }
+.atalho:hover:not(:disabled) { border-color: #33435a; background: var(--painel2); transform: translateY(-2px); }
+.atalho .ic { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; }
+.atalho p { color: var(--suave); font-size: 12.5px; }
+
+/* ---------- Limpeza ---------- */
+.resumo { display: flex; align-items: center; gap: 18px; padding: 16px 20px; margin-bottom: 16px; }
+.resumo .num { font-size: 28px; font-weight: 700; color: var(--acento); letter-spacing: -.5px; }
+.resumo .txt { color: var(--suave); }
+.grupo { margin-bottom: 14px; overflow: hidden; }
+.grupo-topo { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--borda); }
+.grupo-topo .tam { margin-left: auto; color: var(--suave); font-weight: 600; }
+.letra { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font-weight: 700; font-size: 13px; flex: none; }
+.item { display: flex; align-items: center; gap: 14px; padding: 12px 18px; cursor: pointer; transition: background .12s; }
+.item + .item { border-top: 1px solid rgba(35,45,59,.6); }
+.item:hover { background: var(--painel2); }
+.item .txt { flex: 1; min-width: 0; }
+.item .txt b { font-weight: 550; }
+.item .txt p { color: var(--suave); font-size: 12.5px; }
+.item .tam { font-variant-numeric: tabular-nums; color: var(--suave); min-width: 80px; text-align: right; }
+.item .tam.cheio { color: var(--texto); font-weight: 600; }
+.aviso-nav { display: flex; align-items: center; gap: 10px; padding: 10px 18px; background: rgba(245,184,74,.08); color: var(--aviso); font-size: 13px; }
+.aviso-nav button { margin-left: auto; }
+.check { appearance: none; width: 20px; height: 20px; border-radius: 6px; border: 2px solid #3a4759; flex: none; cursor: pointer; transition: .12s; display: grid; place-items: center; }
+.check:checked { background: var(--acento); border-color: var(--acento); }
+.check:checked::after { content: ""; width: 5px; height: 10px; border: solid #04231b; border-width: 0 2.5px 2.5px 0; transform: translateY(-1px) rotate(45deg); }
+
+/* ---------- Ferramentas (saúde) ---------- */
+.ferr-grade { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.ferr { padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+.ferr p { color: var(--suave); font-size: 13px; flex: 1; }
+.ferr .tempo { font-size: 12px; color: var(--apagado); display: flex; align-items: center; gap: 6px; }
+.ferr .tempo svg.i { width: 14px; height: 14px; }
+.ferr .btn { align-self: flex-start; margin-top: 6px; }
+.destaque { padding: 22px; margin-bottom: 16px; display: flex; align-items: center; gap: 20px;
+  background: radial-gradient(120% 160% at 0% 0%, rgba(91,156,255,.16), transparent 60%), var(--painel); }
+.destaque > div { flex: 1; }
+.destaque p { color: var(--suave); }
+.status-linha { display: flex; gap: 10px; flex-wrap: wrap; padding: 16px 18px; border-bottom: 1px solid var(--borda); }
+.pilula { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 99px; font-size: 13px; background: var(--painel2); }
+.pilula::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--apagado); }
+.pilula.ok::before { background: var(--acento); } .pilula.ruim::before { background: var(--aviso); } .pilula.mal::before { background: var(--perigo); }
+.dica { margin-top: 16px; padding: 14px 18px; color: var(--suave); font-size: 13px; display: flex; gap: 12px; }
+.dica svg.i { color: var(--azul); }
+
+/* ---------- Listas ---------- */
+.secao { margin-bottom: 18px; overflow: hidden; }
+.secao-topo { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--borda); flex-wrap: wrap; }
+.secao-topo p { color: var(--suave); font-size: 13px; }
+.secao-topo .acoes { margin-left: auto; }
+.linha { display: flex; align-items: center; gap: 14px; padding: 12px 18px; }
+.linha + .linha { border-top: 1px solid rgba(35,45,59,.6); }
+.linha .txt { flex: 1; min-width: 0; }
+.linha .txt b { font-weight: 550; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.linha .txt p { color: var(--suave); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.versao { font-size: 12.5px; color: var(--suave); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.versao em { font-style: normal; color: var(--acento); font-weight: 600; }
+.tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; letter-spacing: .3px; text-transform: uppercase; white-space: nowrap; }
+.tag.azul { background: rgba(91,156,255,.15); color: var(--azul); }
+.tag.cinza { background: rgba(138,151,168,.14); color: var(--suave); }
+.tag.amarelo { background: rgba(245,184,74,.12); color: var(--aviso); }
+.tag.verde { background: rgba(56,217,169,.12); color: var(--acento); }
+.tag.vermelho { background: rgba(255,107,107,.12); color: var(--perigo); }
+.vazio { padding: 30px 18px; text-align: center; color: var(--suave); }
+.vazio b { display: block; color: var(--texto); font-size: 15px; margin-bottom: 2px; }
+.rodape-secao { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-top: 1px solid var(--borda); background: var(--painel2); flex-wrap: wrap; }
+.rodape-secao label { display: flex; align-items: center; gap: 10px; color: var(--suave); cursor: pointer; }
+.rodape-secao .btn:last-child { margin-left: auto; }
+.abas { display: inline-flex; gap: 4px; padding: 4px; background: var(--painel); border: 1px solid var(--borda); border-radius: 12px; margin-bottom: 18px; }
+.abas button { padding: 8px 18px; border-radius: 9px; color: var(--suave); font-weight: 600; display: flex; gap: 8px; align-items: center; }
+.abas button.ativo { background: var(--painel2); color: var(--texto); }
+.abas .cont { background: var(--aviso); color: #2a1d00; font-size: 11px; padding: 0 7px; border-radius: 99px; }
+.sub-aba { display: none; } .sub-aba.ativa { display: block; }
+details.card summary { padding: 16px 18px; cursor: pointer; font-weight: 600; list-style: none; display: flex; align-items: center; gap: 10px; }
+details.card summary::after { content: "›"; margin-left: auto; color: var(--suave); font-size: 20px; transition: .2s; }
+details.card[open] summary::after { transform: rotate(90deg); }
+details.card[open] summary { border-bottom: 1px solid var(--borda); }
+
+.chave { position: relative; width: 42px; height: 24px; flex: none; }
+.chave input { position: absolute; opacity: 0; inset: 0; cursor: pointer; z-index: 1; margin: 0; }
+.chave span { position: absolute; inset: 0; border-radius: 99px; background: #2d3848; transition: .2s; }
+.chave span::after { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; border-radius: 50%; background: #c6d0dc; transition: .2s; }
+.chave input:checked + span { background: var(--acento); }
+.chave input:checked + span::after { transform: translateX(18px); background: #fff; }
+.chave input:disabled { cursor: not-allowed; }
+
+.girando { width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid rgba(255,255,255,.15); border-top-color: var(--acento); animation: gira .8s linear infinite; flex: none; }
+.btn .girando { width: 16px; height: 16px; border-top-color: currentColor; }
+@keyframes gira { to { transform: rotate(360deg); } }
+.carregando { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 30px; color: var(--suave); }
+
+/* ---------- Automático ---------- */
+.auto-topo { padding: 24px; display: flex; gap: 20px; align-items: center; border-radius: var(--raio) var(--raio) 0 0;
+  background: radial-gradient(120% 160% at 100% 0%, rgba(169,139,255,.16), transparent 60%), var(--painel); }
+.auto-topo > div { flex: 1; }
+.auto-topo p { color: var(--suave); }
+.auto-config { display: flex; gap: 16px; align-items: center; padding: 18px 24px; border-top: 1px solid var(--borda); flex-wrap: wrap; }
+.auto-config label { display: flex; gap: 10px; align-items: center; color: var(--suave); }
+.auto-lista { padding: 6px 24px 18px; }
+.auto-lista li { color: var(--suave); padding: 4px 0; list-style: none; display: flex; gap: 10px; align-items: center; }
+.auto-lista li::before { content: "✓"; color: var(--acento); font-weight: 800; }
+
+/* ---------- Console ---------- */
+.console { border-top: 1px solid var(--borda); background: #0a0d12; display: flex; flex-direction: column; height: 260px; transition: height .25s ease; }
+.console.escondido { display: none; }
+.console.mini { height: 54px; }
+.console-topo { display: flex; align-items: center; gap: 14px; padding: 0 20px; height: 54px; flex: none; }
+.console-topo b { font-weight: 600; white-space: nowrap; }
+.console-topo .estado { color: var(--suave); font-size: 13px; white-space: nowrap; }
+.barra { flex: 1; height: 6px; border-radius: 99px; background: var(--painel2); overflow: hidden; min-width: 80px; }
+.barra div { height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, var(--acento), var(--azul)); transition: width .3s ease; }
+.barra.indef div { width: 30% !important; animation: vai 1.3s ease-in-out infinite; }
+@keyframes vai { from { transform: translateX(-100%); } to { transform: translateX(340%); } }
+.icone-btn { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: var(--suave); }
+.icone-btn:hover { background: var(--hover); color: var(--texto); }
+.console pre { flex: 1; overflow-y: auto; margin: 0 20px 14px; padding: 12px 14px; border-radius: 10px; background: var(--painel);
+  font: 12.5px/1.6 "Cascadia Mono", Consolas, monospace; color: #b8c4d2; white-space: pre-wrap; word-break: break-word; user-select: text; }
+.console.mini pre { display: none; }
+.ok-txt { color: var(--acento); } .erro-txt { color: var(--perigo); } .aviso-txt { color: var(--aviso); }
+
+/* ---------- Modal e toast ---------- */
+.fundo { position: fixed; inset: 0; background: rgba(4,7,11,.7); backdrop-filter: blur(3px); display: none; place-items: center; z-index: 10; }
+.fundo.aberto { display: grid; }
+.modal { width: min(440px, 90vw); padding: 24px; animation: entra .2s ease; }
+.modal h2 { font-size: 18px; margin-bottom: 8px; }
+.modal p { color: var(--suave); }
+.modal .alerta { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: rgba(255,107,107,.1); color: var(--perigo); font-size: 13px; }
+.modal .acoes { justify-content: flex-end; margin-top: 22px; }
+.toast { position: fixed; right: 24px; bottom: 24px; max-width: 380px; padding: 12px 16px; border-radius: 12px; background: var(--painel2); border: 1px solid var(--borda);
+  box-shadow: 0 12px 40px -10px rgba(0,0,0,.6); transform: translateY(120px); opacity: 0; transition: .3s; z-index: 20; }
+.toast.visivel { transform: none; opacity: 1; }
+.toast.erro { border-color: rgba(255,107,107,.5); }
+
+/* ---------- Tela de carregamento ---------- */
+.splash { position: fixed; inset: 0; z-index: 50; display: grid; place-content: center; justify-items: center; gap: 14px; text-align: center;
+  background: radial-gradient(60% 60% at 50% 40%, rgba(56,217,169,.14), transparent 70%), var(--bg); transition: opacity .5s ease, visibility .5s; }
+.splash.saindo { opacity: 0; visibility: hidden; }
+.splash img { width: 150px; height: 150px; animation: pula 1.1s ease-in-out infinite; filter: drop-shadow(0 18px 30px rgba(56,217,169,.3)); }
+@keyframes pula { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-14px) rotate(2deg); } }
+.splash .sombra { width: 90px; height: 12px; border-radius: 50%; background: rgba(0,0,0,.5); margin-top: -10px; animation: sombra 1.1s ease-in-out infinite; }
+@keyframes sombra { 50% { transform: scaleX(.7); opacity: .5; } }
+.splash h1 { font-size: 32px; margin-top: 6px; background: linear-gradient(90deg, var(--acento), var(--azul)); -webkit-background-clip: text; color: transparent; }
+.splash .frase { color: var(--suave); min-height: 21px; }
+.splash .barra { width: 260px; flex: none; }
+.splash small { color: var(--apagado); font-size: 12px; }
+
+/* ---------- Registro ---------- */
+.problema { display: flex; gap: 14px; align-items: center; padding: 16px 18px; }
+.problema + .problema { border-top: 1px solid var(--borda); }
+.problema .ic { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: rgba(245,184,74,.14); color: var(--aviso); flex: none; }
+.problema .txt { flex: 1; min-width: 0; }
+.problema .txt p { color: var(--suave); font-size: 13px; }
+.problema code { font: 11.5px "Cascadia Mono", Consolas, monospace; color: var(--apagado); display: block; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.visor { height: 440px; overflow-y: auto; padding: 14px 18px; font: 12.5px/1.65 "Cascadia Mono", Consolas, monospace; color: #b8c4d2; white-space: pre-wrap; word-break: break-word; user-select: text; background: #0a0d12; border-radius: 0 0 var(--raio) var(--raio); }
+.visor .h { color: var(--texto); font-weight: 700; margin-top: 8px; display: block; }
+.visor .ok { color: var(--acento); } .visor .av { color: var(--aviso); } .visor .er { color: var(--perigo); }
+.visor .t { color: var(--apagado); }
+.passos label { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; cursor: pointer; color: var(--texto); }
+.passos label small { display: block; color: var(--suave); font-size: 12.5px; }
+
+@media (max-width: 1150px) {
+  .inicio-grade { grid-template-columns: 1fr; }
+  .hw-grade, .ferr-grade { grid-template-columns: 1fr 1fr; }
+  .rapidas { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-casa" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-brilho" viewBox="0 0 24 24"><path d="M11 3l1.9 5.1L18 10l-5.1 1.9L11 17l-1.9-5.1L4 10l5.1-1.9z"/><path d="M18.5 14.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z"/></symbol>
+    <symbol id="i-escudo" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8.2-8 9-4.5-.8-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+    <symbol id="i-atualizar" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-14 5.3M4 12a8 8 0 0 1 14-5.3"/><path d="M18.5 3v4h-4M5.5 21v-4h4"/></symbol>
+    <symbol id="i-energia" viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M6.3 6.8a8 8 0 1 0 11.4 0"/></symbol>
+    <symbol id="i-calendario" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="m9.5 15 2 2 3.5-3.5"/></symbol>
+    <symbol id="i-lupa" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-lixo" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+    <symbol id="i-relogio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+    <symbol id="i-alerta" viewBox="0 0 24 24"><path d="M12 4 2.5 20h19z"/><path d="M12 10v4M12 17h.01"/></symbol>
+    <symbol id="i-seta-baixo" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-seta-cima" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-parar" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+    <symbol id="i-baixar" viewBox="0 0 24 24"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"/></symbol>
+    <symbol id="i-volta" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"/><path d="M4 4v4.5h4.5"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/></symbol>
+    <symbol id="i-gpu" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="11" rx="2"/><circle cx="9" cy="11.5" r="3"/><path d="M15 9.5h3.5M15 13.5h3.5M5 17v2.5"/></symbol>
+    <symbol id="i-ram" viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="9" rx="1.5"/><path d="M6 10v3M10 10v3M14 10v3M18 10v3M5 16v2.5M19 16v2.5"/></symbol>
+    <symbol id="i-placa" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="2"/><rect x="7" y="7" width="5" height="5"/><path d="M15 7h2M15 10h2M7 15.5h10"/></symbol>
+    <symbol id="i-disco" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 14h18"/><circle cx="17" cy="16.5" r=".6"/></symbol>
+    <symbol id="i-windows" viewBox="0 0 24 24"><path d="M3.5 5.5 10.5 4.5v7h-7zM13 4.2l7.5-1v8.3H13zM3.5 13h7v6.8l-7-1zM13 13h7.5v8l-7.5-1z"/></symbol>
+    <symbol id="i-virus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.9 2.9M15.5 15.5l2.9 2.9M5.6 18.4l2.9-2.9M15.5 8.5l2.9-2.9"/></symbol>
+    <symbol id="i-rede" viewBox="0 0 24 24"><path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.7 16a5 5 0 0 1 6.6 0"/><circle cx="12" cy="19.5" r=".8"/></symbol>
+    <symbol id="i-lista" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
+    <symbol id="i-copiar" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="12" rx="2"/><path d="M15.5 8.5V5.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-pasta" viewBox="0 0 24 24"><path d="M3.5 6.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="i-varinha" viewBox="0 0 24 24"><path d="m4 20 11-11M14 4l1 2.5L17.5 7.5 15 8.5 14 11l-1-2.5L10.5 7.5 13 6.5z"/><path d="M19 12.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/></symbol>
+    <symbol id="i-chip" viewBox="0 0 24 24"><path d="M14 3h-4v3H7a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3v3h4v-3h3a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-3z"/><path d="M10 10h4v4h-4z"/></symbol>
+  </defs>
+</svg>
+
+<div class="splash" id="splash">
+  <img src="mascote.png" alt="">
+  <div class="sombra"></div>
+  <h1>PC Estribado</h1>
+  <div class="frase" id="splashFrase">Botando os óculos escuros...</div>
+  <div class="barra"><div id="splashBarra" style="width:8%"></div></div>
+  <small id="splashVersao"></small>
+</div>
+
+<aside class="lateral">
+  <div class="marca">
+    <img class="logo" src="mascote.png" alt="">
+    <div><b>PC Estribado</b><small>leve, liso e sem travar</small></div>
+  </div>
+  <nav>
+    <button data-pag="inicio" class="ativo"><svg class="i"><use href="#i-casa"/></svg>Início</button>
+    <button data-pag="limpeza"><svg class="i"><use href="#i-brilho"/></svg>Limpeza</button>
+    <button data-pag="saude"><svg class="i"><use href="#i-escudo"/></svg>Saúde do sistema</button>
+    <button data-pag="atualizacoes"><svg class="i"><use href="#i-atualizar"/></svg>Atualizações</button>
+    <button data-pag="inicializacao"><svg class="i"><use href="#i-energia"/></svg>Inicialização</button>
+    <button data-pag="automatico"><svg class="i"><use href="#i-calendario"/></svg>Automático</button>
+    <button data-pag="registro"><svg class="i"><use href="#i-lista"/></svg>Registro <span class="cont" id="contProblemas" hidden style="margin-left:auto;background:var(--aviso);color:#2a1d00;font-size:11px;padding:0 7px;border-radius:99px;font-weight:700"></span></button>
+  </nav>
+  <div class="rodape-lateral" id="infoPc" onclick="irPara('sobre')" title="Sobre e atualizações"><b>Carregando...</b></div>
+</aside>
+
+<main>
+  <div class="conteudo">
+    <div class="faixa" id="faixaAdmin" hidden>
+      <svg class="i"><use href="#i-alerta"/></svg>
+      <span>Rodando <b>sem administrador</b>: várias funções não vão funcionar direito. Feche e abra o PC Estribado de novo aceitando a permissão.</span>
+    </div>
+    <div class="faixa verde" id="faixaAtualizacao" hidden>
+      <svg class="i"><use href="#i-brilho"/></svg>
+      <span>Saiu a versão <b id="faixaAttVersao"></b> do PC Estribado! 🎉</span>
+      <button class="btn sec peq" onclick="irPara('sobre')">Ver novidades</button>
+      <button class="btn primario peq acao" onclick="instalarAtualizacao()">Atualizar agora</button>
+    </div>
+    <div class="faixa azul" id="faixaReinicio" hidden>
+      <svg class="i"><use href="#i-volta"/></svg>
+      <span>Tem atualização esperando o PC <b>reiniciar</b> pra terminar de instalar.</span>
+      <button class="btn sec peq" onclick="reiniciar()">Reiniciar agora</button>
+    </div>
+
+    <!-- INÍCIO -->
+    <section class="pagina ativa" id="pag-inicio">
+      <div class="topo"><div><h1 id="saudacao">Fala!</h1><p class="sub">Aqui tá o raio-x do seu PC.</p></div></div>
+
+      <div class="inicio-grade">
+        <div class="card nota">
+          <div class="nota-esq">
+            <div class="anel" style="width:132px;height:132px" id="anelNota"></div>
+            <div class="rotulo" id="notaRotulo">Calculando...</div>
+            <p id="notaTexto">Checando tudo que deixa o PC saudável.</p>
+            <button class="btn primario peq acao" id="btnResolverTudo" onclick="resolverTudo()" hidden><svg class="i"><use href="#i-varinha"/></svg>Resolver tudo</button>
+          </div>
+          <div class="checklist" id="checklist">
+            <div class="esqueleto"></div><div class="esqueleto"></div><div class="esqueleto"></div><div class="esqueleto"></div>
+          </div>
+        </div>
+        <div class="card ao-vivo">
+          <div class="medidores">
+            <div class="medidor"><div class="anel" style="width:104px;height:104px" id="anelCpu"></div><span class="nome">Processador</span><small id="cpuMhz">–</small></div>
+            <div class="medidor"><div class="anel" style="width:104px;height:104px" id="anelRam"></div><span class="nome">Memória RAM</span><small id="ramTxt">–</small></div>
+          </div>
+          <div id="discosVivo"></div>
+          <div class="disco-linha" style="grid-template-columns:auto 1fr"><span class="sub" style="margin:0">Ligado há</span><b id="ligadoHa" style="text-align:right">–</b></div>
+        </div>
+      </div>
+
+      <h3>Seu hardware</h3>
+      <div class="hw-grade" id="hwGrade">
+        <div class="card hw"><div class="txt" style="flex:1"><div class="esqueleto"></div><div class="esqueleto" style="width:60%"></div></div></div>
+        <div class="card hw"><div class="txt" style="flex:1"><div class="esqueleto"></div><div class="esqueleto" style="width:60%"></div></div></div>
+        <div class="card hw"><div class="txt" style="flex:1"><div class="esqueleto"></div><div class="esqueleto" style="width:60%"></div></div></div>
+      </div>
+
+      <h3>O que mais está usando memória agora</h3>
+      <div class="card processos" id="processos"><div class="esqueleto"></div></div>
+
+      <h3>Ações rápidas</h3>
+      <div class="rapidas">
+        <button class="card atalho acao" onclick="limpezaRapida()">
+          <div class="ic" style="background:rgba(56,217,169,.14);color:var(--acento)"><svg class="i"><use href="#i-brilho"/></svg></div>
+          <h2>Limpeza rápida</h2><p>Analisa e limpa os temporários e caches.</p>
+        </button>
+        <button class="card atalho acao" onclick="irPara('saude'); acao('tudo')">
+          <div class="ic" style="background:rgba(91,156,255,.14);color:var(--azul)"><svg class="i"><use href="#i-escudo"/></svg></div>
+          <h2>Checagem completa</h2><p>DISM, SFC e CHKDSK em sequência.</p>
+        </button>
+        <button class="card atalho acao" onclick="acao('defender_rapida')">
+          <div class="ic" style="background:rgba(255,107,107,.14);color:var(--perigo)"><svg class="i"><use href="#i-virus"/></svg></div>
+          <h2>Caçar vírus</h2><p>Verificação rápida com o antivírus do Windows.</p>
+        </button>
+        <button class="card atalho acao" onclick="pontoRestauracao()">
+          <div class="ic" style="background:rgba(169,139,255,.14);color:var(--roxo)"><svg class="i"><use href="#i-volta"/></svg></div>
+          <h2>Ponto de restauração</h2><p>Um "save" do Windows pra voltar se algo der errado.</p>
+        </button>
+      </div>
+    </section>
+
+    <!-- LIMPEZA -->
+    <section class="pagina" id="pag-limpeza">
+      <div class="topo">
+        <div><h1>Limpeza</h1><p class="sub">Marque o que quer limpar. Analisar não apaga nada.</p></div>
+        <div class="acoes">
+          <button class="btn sec acao" id="btnAnalisar" onclick="analisar()"><svg class="i"><use href="#i-lupa"/></svg>Analisar</button>
+          <button class="btn primario acao" id="btnLimpar" onclick="limpar()"><svg class="i"><use href="#i-lixo"/></svg>Limpar</button>
+        </div>
+      </div>
+      <div class="card resumo">
+        <div class="num" id="totalSel">–</div>
+        <div class="txt" id="totalTxt">Clique em <b>Analisar</b> pra ver quanto espaço dá pra liberar.</div>
+      </div>
+      <div id="gruposLimpeza"></div>
+      <div class="card destaque" style="margin-top:4px">
+        <div>
+          <h2>Limpeza profunda do Windows</h2>
+          <p>Remove versões antigas de componentes que o Windows guarda depois das atualizações (pasta WinSxS). Pode liberar alguns GB. Leva de 5 a 20 minutos.</p>
+        </div>
+        <button class="btn sec acao" onclick="acao('componentes')"><svg class="i"><use href="#i-play"/></svg>Rodar</button>
+      </div>
+    </section>
+
+    <!-- SAÚDE -->
+    <section class="pagina" id="pag-saude">
+      <div class="topo"><div><h1>Saúde do sistema</h1><p class="sub">Ferramentas oficiais do Windows pra achar e reparar problemas.</p></div></div>
+
+      <div class="card destaque">
+        <div>
+          <h2 style="font-size:18px">Checagem completa</h2>
+          <p>Roda DISM, SFC e CHKDSK nessa ordem. Leva de 15 a 40 minutos, e dá pra usar o PC enquanto isso.</p>
+        </div>
+        <button class="btn primario acao" onclick="acao('tudo')"><svg class="i"><use href="#i-play"/></svg>Rodar tudo</button>
+      </div>
+      <div class="ferr-grade">
+        <div class="card ferr">
+          <h2>DISM</h2>
+          <p>Repara a "imagem" do Windows baixando arquivos bons da Microsoft. É o que o SFC usa de referência.</p>
+          <span class="tempo"><svg class="i"><use href="#i-relogio"/></svg>10 a 25 min · precisa de internet</span>
+          <button class="btn sec peq acao" onclick="acao('dism')">Rodar DISM</button>
+        </div>
+        <div class="card ferr">
+          <h2>SFC</h2>
+          <p>Verifica todos os arquivos protegidos do sistema e troca os corrompidos.</p>
+          <span class="tempo"><svg class="i"><use href="#i-relogio"/></svg>5 a 15 min</span>
+          <button class="btn sec peq acao" onclick="acao('sfc')">Rodar SFC</button>
+        </div>
+        <div class="card ferr">
+          <h2>CHKDSK</h2>
+          <p>Procura erros no sistema de arquivos do disco, sem precisar reiniciar.</p>
+          <span class="tempo"><svg class="i"><use href="#i-relogio"/></svg>2 a 10 min</span>
+          <button class="btn sec peq acao" onclick="acao('chkdsk')">Rodar CHKDSK</button>
+        </div>
+      </div>
+
+      <h3>Antivírus</h3>
+      <div class="card secao">
+        <div class="status-linha" id="defStatus"><div class="carregando" style="padding:6px">Carregando...</div></div>
+        <div class="linha">
+          <div class="txt"><b>Atualizar definições</b><p>Baixa a lista mais nova de vírus conhecidos.</p></div>
+          <button class="btn sec peq acao" onclick="acao('defender_atualizar')">Atualizar</button>
+        </div>
+        <div class="linha">
+          <div class="txt"><b>Verificação rápida</b><p>Olha os lugares onde vírus costumam se esconder. Uns 5 minutos.</p></div>
+          <button class="btn sec peq acao" onclick="acao('defender_rapida')">Verificar</button>
+        </div>
+        <div class="linha">
+          <div class="txt"><b>Verificação completa</b><p>Olha todos os arquivos do PC. Pode levar mais de uma hora.</p></div>
+          <button class="btn sec peq acao" onclick="acao('defender_completa')">Verificar tudo</button>
+        </div>
+      </div>
+
+      <h3>Discos</h3>
+      <div class="card secao">
+        <div id="discosSaude"><div class="carregando">Carregando...</div></div>
+        <div class="linha" style="border-top:1px solid var(--borda)">
+          <div class="txt"><b>Otimizar unidade</b><p>No SSD faz o TRIM (mantém a velocidade); no HD desfragmenta. É o mesmo que o Windows faz de vez em quando.</p></div>
+          <button class="btn sec peq acao" onclick="acao('otimizar')">Otimizar</button>
+        </div>
+      </div>
+
+      <h3>Internet</h3>
+      <div class="card secao">
+        <div class="linha">
+          <div class="txt"><b>Limpar cache de DNS</b><p>Resolve site que não abre ou abre a versão velha. Rápido e sem risco.</p></div>
+          <button class="btn sec peq acao" onclick="acao('dns')">Limpar</button>
+        </div>
+        <div class="linha">
+          <div class="txt"><b>Resetar rede</b><p>Volta as configurações de rede pro padrão. Use quando a internet tá estranha e nada resolve. Precisa reiniciar depois.</p></div>
+          <button class="btn sec peq acao" onclick="acao('rede')">Resetar</button>
+        </div>
+      </div>
+
+      <div class="card dica">
+        <svg class="i"><use href="#i-info"/></svg>
+        <div>Se o SFC achar arquivos corrompidos e <b>não conseguir reparar</b>, rode o DISM e depois o SFC de novo. Se o CHKDSK achar erros, ele vai sugerir reparar na próxima reinicialização.</div>
+      </div>
+    </section>
+
+    <!-- ATUALIZAÇÕES -->
+    <section class="pagina" id="pag-atualizacoes">
+      <div class="topo"><div><h1>Atualizações</h1><p class="sub">Programas, drivers e Windows, tudo daqui mesmo.</p></div></div>
+      <div class="abas" id="abasAtt">
+        <button data-aba="programas" class="ativo">Programas <span class="cont" id="contProg" hidden></span></button>
+        <button data-aba="drivers">Drivers <span class="cont" id="contDrv" hidden></span></button>
+        <button data-aba="windows">Windows Update <span class="cont" id="contWin" hidden></span></button>
+      </div>
+
+      <div class="sub-aba ativa" id="aba-programas">
+        <div class="card secao">
+          <div class="secao-topo">
+            <div><h2>Programas instalados</h2><p>Atualiza pelo winget, o gerenciador de pacotes do Windows.</p></div>
+            <div class="acoes">
+              <button class="btn sec peq" id="btnWgProcurar" onclick="procurarProgramas()"><svg class="i"><use href="#i-lupa"/></svg>Procurar</button>
+              <button class="btn primario peq acao" id="btnWgTodos" onclick="atualizarPrograma(null)" hidden><svg class="i"><use href="#i-baixar"/></svg>Atualizar todos</button>
+            </div>
+          </div>
+          <div id="listaWinget"><div class="vazio">Clique em <b style="display:inline">Procurar</b> pra ver o que tem atualização.</div></div>
+        </div>
+      </div>
+
+      <div class="sub-aba" id="aba-drivers">
+        <div class="card secao">
+          <div class="secao-topo">
+            <div><h2>Drivers novos disponíveis</h2><p>Procura no catálogo da Microsoft drivers mais novos pro seu hardware.</p></div>
+            <div class="acoes">
+              <button class="btn sec peq acao" onclick="acao('hardware')" title="Faz o Windows procurar dispositivos novos ou sem driver">Detectar hardware</button>
+              <button class="btn sec peq" id="btnDrvProcurar" onclick="procurarWU(true)"><svg class="i"><use href="#i-lupa"/></svg>Procurar drivers</button>
+            </div>
+          </div>
+          <div id="listaDrvWU"><div class="vazio">Clique em <b style="display:inline">Procurar drivers</b>. A busca leva de 30 segundos a 2 minutos.</div></div>
+          <div class="rodape-secao" id="rodapeDrvWU" hidden>
+            <label><input type="checkbox" class="check" id="drvPonto" checked>Criar ponto de restauração antes</label>
+            <button class="btn primario acao" onclick="instalarWU(true)"><svg class="i"><use href="#i-baixar"/></svg>Instalar selecionados</button>
+          </div>
+        </div>
+        <div class="card secao">
+          <div class="secao-topo"><div><h2>Dispositivos com problema</h2><p>Peças que o Windows reconhece mas não estão funcionando direito.</p></div></div>
+          <div id="listaProblemas"><div class="carregando">Carregando...</div></div>
+        </div>
+        <div class="card secao">
+          <div class="secao-topo">
+            <div><h2>Seus drivers principais</h2><p>Vídeo, rede, som e armazenamento. Driver com mais de 3 anos é marcado como antigo.</p></div>
+            <div class="acoes">
+              <button class="btn sec peq" id="btnDrvVerificar" onclick="procurarWU(true)"><svg class="i"><use href="#i-lupa"/></svg>Verificar atualizações</button>
+              <button class="btn primario peq acao" id="btnDrvTodos" onclick="atualizarTodosDrivers()" hidden><svg class="i"><use href="#i-baixar"/></svg>Atualizar todos</button>
+            </div>
+          </div>
+          <div id="listaDrivers"><div class="carregando">Carregando...</div></div>
+        </div>
+      </div>
+
+      <div class="sub-aba" id="aba-windows">
+        <div class="card secao">
+          <div class="secao-topo">
+            <div><h2>Atualizações do Windows</h2><p>Segurança, correções e recursos novos.</p></div>
+            <div class="acoes"><button class="btn sec peq" id="btnWinProcurar" onclick="procurarWU(false)"><svg class="i"><use href="#i-lupa"/></svg>Procurar</button></div>
+          </div>
+          <div id="listaWU"><div class="vazio">A busca pode levar 1 ou 2 minutos.</div></div>
+          <div class="rodape-secao" id="rodapeWU" hidden>
+            <label><input type="checkbox" class="check" id="wuPonto" checked>Criar ponto de restauração antes</label>
+            <button class="btn primario acao" onclick="instalarWU(false)"><svg class="i"><use href="#i-baixar"/></svg>Instalar selecionadas</button>
+          </div>
+        </div>
+        <details class="card secao" id="detHistorico">
+          <summary><svg class="i"><use href="#i-relogio"/></svg>Histórico de atualizações</summary>
+          <div id="listaHistorico"><div class="carregando">Carregando...</div></div>
+        </details>
+      </div>
+    </section>
+
+    <!-- INICIALIZAÇÃO -->
+    <section class="pagina" id="pag-inicializacao">
+      <div class="topo">
+        <div><h1>Inicialização</h1><p class="sub">Desativar não desinstala nada: funciona igual ao Gerenciador de Tarefas e dá pra religar quando quiser.</p></div>
+        <button class="btn sec" onclick="carregarStartup()"><svg class="i"><use href="#i-atualizar"/></svg>Recarregar</button>
+      </div>
+      <div class="card secao" id="listaStartup"><div class="carregando"><div class="girando"></div>Carregando...</div></div>
+    </section>
+
+    <!-- AUTOMÁTICO -->
+    <section class="pagina" id="pag-automatico">
+      <div class="topo"><div><h1>Manutenção automática</h1><p class="sub">O PC Estribado se cuida sozinho, toda semana, sem você precisar abrir nada.</p></div></div>
+      <div class="card">
+        <div class="auto-topo">
+          <div>
+            <h2 style="font-size:18px" id="autoTitulo">Desligada</h2>
+            <p id="autoTexto">Liga aqui e escolhe o dia e a hora.</p>
+          </div>
+          <label class="chave" style="transform:scale(1.25)"><input type="checkbox" id="autoChave"><span></span></label>
+        </div>
+        <div class="auto-config">
+          <label>Dia <select id="autoDia">
+            <option value="segunda">Segunda</option><option value="terca">Terça</option><option value="quarta">Quarta</option>
+            <option value="quinta">Quinta</option><option value="sexta">Sexta</option><option value="sabado">Sábado</option><option value="domingo">Domingo</option>
+          </select></label>
+          <label>Horário <input type="time" id="autoHora" value="12:00"></label>
+          <button class="btn sec peq" id="autoSalvar" onclick="salvarAuto()" hidden>Salvar horário</button>
+        </div>
+        <div class="auto-config" style="display:block">
+          <h2 style="margin-bottom:6px">O que ele faz</h2>
+          <ul class="auto-lista" style="padding:0">
+            <li>Limpa os temporários do Windows, o cache do Windows Update e os relatórios de erro</li>
+            <li>Limpa o cache do Chrome e do Edge (se estiverem fechados na hora)</li>
+            <li>Atualiza as definições do antivírus</li>
+            <li>Limpa o cache de DNS</li>
+          </ul>
+          <p class="sub" style="font-size:13px;margin-top:8px">Se o PC estiver desligado na hora marcada, ele roda assim que você ligar. Tudo fica registrado no log.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOBRE -->
+    <section class="pagina" id="pag-sobre">
+      <div class="card sobre-topo">
+        <img src="mascote.png" alt="">
+        <div style="flex:1"><h1>PC Estribado</h1><p class="sub" id="sobreVersao">leve, liso e sem travar</p></div>
+        <button class="btn sec" onclick="api().abrir_projeto()">Projeto no GitHub</button>
+      </div>
+      <h3>Atualizações do programa</h3>
+      <div class="card secao">
+        <div class="linha">
+          <div class="txt"><b id="attTitulo">Ainda não verificou</b><p id="attTexto">Clique em Verificar agora.</p></div>
+          <button class="btn sec peq" id="btnAttVerificar" onclick="verificarAtualizacao(false)"><svg class="i"><use href="#i-lupa"/></svg>Verificar agora</button>
+          <button class="btn primario peq acao" id="btnAttInstalar" onclick="instalarAtualizacao()" hidden><svg class="i"><use href="#i-baixar"/></svg>Atualizar agora</button>
+        </div>
+        <div class="notas" id="attNotas" hidden></div>
+        <div class="linha" style="border-top:1px solid var(--borda)">
+          <div class="txt"><b>Procurar atualização ao abrir</b><p>Confere no máximo duas vezes por dia, em segundo plano. Nada é instalado sem você mandar.</p></div>
+          <label class="chave"><input type="checkbox" id="attAuto" checked><span></span></label>
+        </div>
+      </div>
+      <div class="card dica">
+        <svg class="i"><use href="#i-escudo"/></svg>
+        <div>Por segurança, o PC Estribado só baixa atualização do <b>GitHub</b> e confere a "impressão digital" (hash SHA-256) do instalador antes de rodar. Se o arquivo tiver sido alterado no caminho, ele é apagado e nada é instalado.</div>
+      </div>
+    </section>
+
+    <!-- REGISTRO -->
+    <section class="pagina" id="pag-registro">
+      <div class="topo"><div><h1>Registro</h1><p class="sub">Tudo que o PC Estribado fez, e os problemas que ele achou pelo caminho.</p></div></div>
+      <div class="card secao">
+        <div class="secao-topo"><div><h2>Problemas encontrados</h2><p>O programa lê o registro e reconhece erros conhecidos. Cada um tem um botão que resolve.</p></div></div>
+        <div id="listaProblemasLog"><div class="carregando">Carregando...</div></div>
+      </div>
+      <div class="card secao">
+        <div class="secao-topo">
+          <div><h2>Registro completo</h2><p>As últimas 800 linhas.</p></div>
+          <div class="acoes">
+            <button class="btn primario peq" onclick="copiarLog()"><svg class="i"><use href="#i-copiar"/></svg>Copiar</button>
+            <button class="btn sec peq" onclick="api().log_pasta()"><svg class="i"><use href="#i-pasta"/></svg>Abrir pasta</button>
+            <button class="btn sec peq" onclick="carregarRegistro()"><svg class="i"><use href="#i-atualizar"/></svg>Atualizar</button>
+            <button class="btn sec peq" onclick="limparLog()"><svg class="i"><use href="#i-lixo"/></svg>Limpar</button>
+          </div>
+        </div>
+        <div class="visor" id="visorLog"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="console escondido" id="console">
+    <div class="console-topo">
+      <div class="girando" id="conGira"></div>
+      <b id="conTitulo">Tarefa</b>
+      <span class="estado" id="conEstado"></span>
+      <div class="barra indef" id="conBarra"><div></div></div>
+      <button class="btn perigo peq" id="conCancelar" onclick="cancelar()"><svg class="i"><use href="#i-parar"/></svg>Cancelar</button>
+      <button class="icone-btn" id="conMin" title="Minimizar" onclick="alternarConsole()"><svg class="i"><use href="#i-seta-baixo"/></svg></button>
+      <button class="icone-btn" id="conFechar" title="Fechar" onclick="fecharConsole()" hidden><svg class="i"><use href="#i-x"/></svg></button>
+    </div>
+    <pre id="conSaida"></pre>
+  </div>
+</main>
+
+<div class="fundo" id="fundo">
+  <div class="card modal">
+    <h2 id="modalTitulo"></h2>
+    <p id="modalTexto"></p>
+    <div class="alerta" id="modalAlerta" hidden></div>
+    <div class="acoes">
+      <button class="btn sec" id="modalNao">Cancelar</button>
+      <button class="btn primario" id="modalSim">Confirmar</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const api = () => window.pywebview.api;
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const icone = nome => `<svg class="i"><use href="#i-${nome}"/></svg>`;
+const carregando = txt => `<div class="carregando"><div class="girando"></div>${txt}</div>`;
+const vazio = (titulo, txt) => `<div class="vazio"><b>${titulo}</b>${txt}</div>`;
+
+let ocupado = false;
+let tarefaAtual = '';
+let depoisDaTarefa = null;
+let alvos = [];
+const marcados = new Set();
+let analise = {};
+const listasWU = { true: [], false: [] };
+
+function fmt(b) {
+  if (b == null) return '–';
+  const u = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let i = 0;
+  while (b >= 1024 && i < 4) { b /= 1024; i++; }
+  return (i === 0 ? b : b.toFixed(b < 10 ? 1 : 0)) + ' ' + u[i];
+}
+function duracao(seg) {
+  const d = Math.floor(seg / 86400), h = Math.floor(seg % 86400 / 3600), m = Math.floor(seg % 3600 / 60);
+  return d ? `${d}d ${h}h` : h ? `${h}h ${m}min` : `${m} min`;
+}
+function anel(el, pct, texto, rotulo, cor) {
+  const tam = el.offsetWidth || 104, esp = tam > 120 ? 12 : 10, r = (tam - esp) / 2, circ = 2 * Math.PI * r;
+  if (!el.querySelector('svg')) {
+    el.innerHTML = `<svg viewBox="0 0 ${tam} ${tam}"><circle class="trilho" cx="${tam/2}" cy="${tam/2}" r="${r}" stroke-width="${esp}"/>
+      <circle class="valor" cx="${tam/2}" cy="${tam/2}" r="${r}" stroke-width="${esp}" stroke-dasharray="0 ${circ}"/></svg>
+      <div><b style="font-size:${tam > 120 ? 30 : 22}px"></b><small></small></div>`;
+  }
+  const v = el.querySelector('.valor');
+  v.setAttribute('stroke-dasharray', `${circ * Math.max(0, Math.min(100, pct)) / 100} ${circ}`);
+  v.style.stroke = cor;
+  el.querySelector('b').textContent = texto;
+  el.querySelector('small').textContent = rotulo;
+}
+const corUso = pct => pct >= 90 ? 'var(--perigo)' : pct >= 75 ? 'var(--aviso)' : 'var(--acento)';
+
+/* ---------- Navegação ---------- */
+const carregadas = {};
+function irPara(pag) {
+  $$('nav button').forEach(b => b.classList.toggle('ativo', b.dataset.pag === pag));
+  $$('.pagina').forEach(p => p.classList.toggle('ativa', p.id === 'pag-' + pag));
+  const primeiraVez = { inicializacao: carregarStartup, saude: carregarSaude, automatico: carregarAuto };
+  if (primeiraVez[pag] && !carregadas[pag]) { carregadas[pag] = true; primeiraVez[pag](); }
+  if (pag === 'inicio') carregarNota();
+  if (pag === 'registro') carregarRegistro();
+}
+$$('nav button').forEach(b => b.onclick = () => irPara(b.dataset.pag));
+$$('#abasAtt button').forEach(b => b.onclick = () => abrirAba(b.dataset.aba));
+function abrirAba(aba) {
+  $$('#abasAtt button').forEach(b => b.classList.toggle('ativo', b.dataset.aba === aba));
+  $$('.sub-aba').forEach(s => s.classList.toggle('ativa', s.id === 'aba-' + aba));
+  if (aba === 'drivers' && !carregadas.drivers) { carregadas.drivers = true; carregarDrivers(); }
+}
+$('#detHistorico').addEventListener('toggle', e => { if (e.target.open && !carregadas.hist) { carregadas.hist = true; carregarHistorico(); } });
+
+/* ---------- Toast e modal ---------- */
+let toastTimer;
+function toast(msg, erro = false) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast visivel' + (erro ? ' erro' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('visivel'), 4500);
+}
+function confirmar(titulo, texto, botao = 'Confirmar', alerta = '') {
+  return new Promise(ok => {
+    $('#modalTitulo').textContent = titulo;
+    $('#modalTexto').innerHTML = texto;
+    $('#modalAlerta').hidden = !alerta;
+    $('#modalAlerta').textContent = alerta;
+    $('#modalSim').textContent = botao;
+    $('#fundo').classList.add('aberto');
+    const fim = v => { $('#fundo').classList.remove('aberto'); ok(v); };
+    $('#modalSim').onclick = () => fim(true);
+    $('#modalNao').onclick = () => fim(false);
+  });
+}
+
+/* ---------- Tarefas em segundo plano ---------- */
+// só os botões que iniciam tarefa (.acao) travam; buscas e listas continuam livres
+function travar(v) {
+  ocupado = v;
+  $$('.acao').forEach(b => { b.disabled = v; b.title = v ? `Espera terminar: ${tarefaAtual}` : ''; });
+}
+async function iniciarTarefa(promessa, depois = null) {
+  if (ocupado) return toast(`Já tem uma tarefa rodando (${tarefaAtual}). Espera ou cancela.`, true);
+  const r = await promessa;
+  if (!r.ok) return toast(r.erro, true);
+  depoisDaTarefa = depois;
+}
+const temPorcentagem = t => /\d+(?:[.,]\d+)?\s*%/.test(t);
+
+window.receber = ev => {
+  const saida = $('#conSaida');
+  if (ev.tipo === 'inicio') {
+    tarefaAtual = ev.titulo;
+    travar(true);
+    saida.textContent = '';
+    $('#console').className = 'console';
+    $('#conMin').innerHTML = icone('seta-baixo');
+    $('#conTitulo').textContent = ev.titulo;
+    $('#conEstado').textContent = 'rodando...';
+    $('#conGira').hidden = false;
+    $('#conCancelar').hidden = false;
+    $('#conCancelar').disabled = false;
+    $('#conFechar').hidden = true;
+    $('#conBarra').className = 'barra indef';
+    $('#conBarra div').style.width = '0';
+  } else if (ev.tipo === 'linha') {
+    // linhas de progresso (com %) substituem a anterior pra não poluir
+    const ultima = saida.lastChild;
+    if (ultima && temPorcentagem(ev.texto) && temPorcentagem(ultima.textContent)) ultima.textContent = ev.texto + '\n';
+    else saida.appendChild(document.createTextNode(ev.texto + '\n'));
+    while (saida.childNodes.length > 800) saida.removeChild(saida.firstChild);
+    saida.scrollTop = saida.scrollHeight;
+  } else if (ev.tipo === 'progresso') {
+    $('#conBarra').className = 'barra';
+    $('#conBarra div').style.width = ev.valor + '%';
+  } else if (ev.tipo === 'fim') {
+    travar(false);
+    $('#conGira').hidden = true;
+    $('#conCancelar').hidden = true;
+    $('#conFechar').hidden = false;
+    $('#conBarra').className = 'barra';
+    $('#conBarra div').style.width = ev.cancelado ? '0' : '100%';
+    $('#conEstado').innerHTML = ev.cancelado ? '<span class="aviso-txt">cancelado</span>'
+      : ev.ok ? '<span class="ok-txt">concluído</span>' : '<span class="erro-txt">deu erro</span>';
+    toast(ev.cancelado ? `${ev.titulo}: cancelado.` : ev.ok ? `${ev.titulo}: concluído!` : `${ev.titulo}: deu erro, olha o detalhe no console.`, !ev.ok && !ev.cancelado);
+    const f = depoisDaTarefa; depoisDaTarefa = null;
+    if (f) f(ev);
+    carregarNota();
+  }
+};
+
+async function cancelar() {
+  const arriscadas = /Instalando atualiza|DISM|Limpeza profunda|Atualizando/;
+  if (arriscadas.test(tarefaAtual) && !await confirmar('Cancelar no meio?',
+    `Parar <b>${esc(tarefaAtual)}</b> no meio pode deixar algo pela metade. Normalmente o Windows se recupera sozinho, mas o ideal é deixar terminar.`, 'Cancelar mesmo')) return;
+  $('#conCancelar').disabled = true;
+  $('#conEstado').textContent = 'cancelando...';
+  await api().cancelar();
+}
+function alternarConsole() {
+  const c = $('#console');
+  c.classList.toggle('mini');
+  $('#conMin').innerHTML = icone(c.classList.contains('mini') ? 'seta-cima' : 'seta-baixo');
+}
+function fecharConsole() { $('#console').classList.add('escondido'); }
+
+function acao(qual) {
+  const textos = {
+    tudo: ['Checagem completa', 'Vai rodar DISM, SFC e CHKDSK em sequência. Leva de 15 a 40 minutos. Dá pra minimizar o console e usar o PC normalmente.'],
+    dism: ['DISM', 'Pode levar até 25 minutos e precisa de internet.'],
+    sfc: ['SFC', 'Leva de 5 a 15 minutos.'],
+    chkdsk: ['CHKDSK', 'Só verifica o disco, não altera nada nem reinicia o PC.'],
+    componentes: ['Limpeza profunda', 'Remove componentes antigos do Windows. Depois disso não dá pra desinstalar as atualizações já aplicadas. Leva de 5 a 20 minutos.'],
+    otimizar: ['Otimizar unidade', 'Leva de 1 a 10 minutos. Dá pra usar o PC normalmente.'],
+    rede: ['Resetar rede', 'A internet pode cair até você reiniciar o PC. Configurações de VPN e IP fixo voltam pro padrão.'],
+    defender_completa: ['Verificação completa', 'Pode levar mais de uma hora e deixar o PC um pouco mais lento enquanto roda.'],
+    dism_sfc: ['DISM + SFC', 'Primeiro o DISM baixa arquivos bons da Microsoft, depois o SFC troca os corrompidos. Leva de 15 a 35 minutos.'],
+    reparar_disco: ['Reparar disco', 'Corrige erros do sistema de arquivos. No disco do Windows, pode pedir pra reiniciar pra terminar.'],
+    reparar_wu: ['Reparar Windows Update', 'Para os serviços do Windows Update, guarda os caches antigos com outro nome e religa tudo do zero. Depois é só procurar as atualizações de novo.'],
+    ativar_protecao: ['Ligar a Proteção do Sistema', 'Liga os pontos de restauração no disco do Windows e já cria o primeiro. Usa um pouco de espaço do disco.'],
+  };
+  if (qual === 'reabrir_admin') return api().reabrir_admin();
+  const recarregar = qual.startsWith('defender') ? carregarDefender : qual === 'otimizar' ? carregarDiscos : null;
+  const rodar = () => iniciarTarefa(api().acao(qual), recarregar);
+  if (!textos[qual]) return rodar();
+  confirmar(`${textos[qual][0]}?`, textos[qual][1], 'Começar').then(ok => ok && rodar());
+}
+function pontoRestauracao() { iniciarTarefa(api().ponto_restauracao()); }
+async function reiniciar() {
+  if (await confirmar('Reiniciar o PC?', 'Salva o que estiver aberto. O PC reinicia em 15 segundos.', 'Reiniciar')) {
+    await api().reiniciar();
+    toast('Reiniciando em 15 segundos...');
+  }
+}
+
+/* ---------- Início ---------- */
+let info = {};
+async function carregarInfo() {
+  info = await api().info();
+  $('#saudacao').textContent = `Fala, ${info.usuario || 'parceiro'}!`;
+  $('#infoPc').innerHTML = `<b>${esc(info.pc)}</b>${esc(info.windows)}<br>
+    <span class="selo ${info.admin ? 'ok' : 'ruim'}">${info.admin ? 'Administrador' : 'Sem administrador'}</span>
+    <span style="float:right;margin-top:8px;color:var(--apagado)">v${esc(info.versao)}</span>`;
+  $('#splashVersao').textContent = 'versão ' + info.versao;
+  $('#faixaAdmin').hidden = info.admin;
+}
+
+async function atualizarMetricas() {
+  if (!$('#pag-inicio').classList.contains('ativa') || document.hidden) return;
+  const m = await api().metricas();
+  anel($('#anelCpu'), m.cpu, Math.round(m.cpu) + '%', 'em uso', corUso(m.cpu));
+  anel($('#anelRam'), m.ram.pct, Math.round(m.ram.pct) + '%', 'em uso', corUso(m.ram.pct));
+  $('#cpuMhz').textContent = m.cpu_mhz ? `${(m.cpu_mhz / 1000).toFixed(2)} GHz` : '';
+  $('#ramTxt').textContent = `${fmt(m.ram.usada)} de ${fmt(m.ram.total)}`;
+  $('#discosVivo').innerHTML = m.discos.map(d => {
+    const pct = (d.total - d.livre) / d.total * 100;
+    return `<div class="disco-linha" style="margin-bottom:8px"><b>${esc(d.letra)}</b>
+      <div class="barrinha"><div style="width:${pct}%;${pct > 90 ? 'background:var(--perigo)' : ''}"></div></div>
+      <span>${fmt(d.livre)} livres de ${fmt(d.total)}</span></div>`;
+  }).join('');
+  $('#ligadoHa').textContent = duracao(m.ligado_ha);
+  const maior = m.processos[0]?.memoria || 1;
+  $('#processos').innerHTML = m.processos.map(p => `<div class="proc"><span>${esc(p.nome)}</span>
+    <div class="barrinha"><div style="width:${p.memoria / maior * 100}%"></div></div><span>${fmt(p.memoria)}</span></div>`).join('');
+}
+
+async function carregarHardware() {
+  const r = await api().hardware();
+  if (!r.ok) { $('#hwGrade').innerHTML = `<div class="card hw">${vazio('Não deu pra ler o hardware', esc(r.erro))}</div>`; return; }
+  const h = r.dados;
+  const ramTotal = h.ram.reduce((s, m) => s + m.tamanho, 0);
+  const card = (ic, cor, rot, titulo, sub) => `<div class="card hw"><div class="ic" style="background:${cor}22;color:${cor}">${icone(ic)}</div>
+    <div class="txt"><small>${rot}</small><b>${esc(titulo)}</b><p>${sub}</p></div></div>`;
+  $('#hwGrade').innerHTML = [
+    card('cpu', '#5b9cff', 'Processador', h.cpu.nome, `${h.cpu.nucleos} núcleos · ${h.cpu.threads} threads · ${(h.cpu.mhz / 1000).toFixed(1)} GHz`),
+    ...h.gpus.map(g => card('gpu', '#ff6b6b', 'Placa de vídeo', g.nome, `Driver ${esc(g.driver)}${g.data ? ' de ' + g.data : ''}`)),
+    card('ram', '#38d9a9', 'Memória RAM', fmt(ramTotal), h.ram.map(m => `${fmt(m.tamanho)} ${esc(m.fabricante)} ${m.velocidade ? m.velocidade + ' MHz' : ''}`).join(' + ')),
+    card('placa', '#f5b84a', 'Placa-mãe', h.placa, `BIOS ${esc(h.bios)}`),
+    ...h.discos.map(d => card('disco', '#a98bff', d.tipo === 'SSD' ? 'SSD' : d.tipo === 'HDD' ? 'HD' : 'Disco', d.nome,
+      `${fmt(d.tamanho)} · ${esc(d.barramento)} · <span style="color:${d.saude === 'Healthy' ? 'var(--acento)' : 'var(--perigo)'}">${d.saude === 'Healthy' ? 'saudável' : esc(d.saude)}</span>`)),
+    card('windows', '#5b9cff', 'Sistema', info.windows, h.instalado ? `Instalado em ${h.instalado}` : ''),
+  ].join('');
+}
+
+/* Nota de saúde: cada item vale igual; 100% = PC estribado */
+let notaCarregando = false;
+async function carregarNota() {
+  if (notaCarregando) return;
+  notaCarregando = true;
+  try {
+    const [r, problemas] = await Promise.all([api().resumo_saude(), api().problemas()]);
+    contador('#contProblemas', problemas.length);
+    const e = r.estado, dias = ts => ts ? (r.agora - ts) / 86400 : Infinity;
+    const def = r.defender.ok ? r.defender.dados : null;
+    const discos = r.discos.ok ? r.discos.dados : [];
+    const livrePct = r.disco ? r.disco.livre / r.disco.total * 100 : 100;
+    const quando = ts => { const d = dias(ts); return d === Infinity ? 'nunca feito por aqui' : d < 1 ? 'hoje' : `há ${Math.floor(d)} dia(s)`; };
+    // [ok?, título, detalhe, comando do botão, texto do botão, passo do "Resolver tudo"]
+    const itens = [
+      [livrePct >= 15, 'Espaço no disco', `${Math.round(livrePct)}% livre`, "irPara('limpeza')", 'Limpar', 'limpeza'],
+      [dias(e.ultima_limpeza) <= 7, 'Limpeza na última semana', quando(e.ultima_limpeza), 'limpezaRapida()', 'Limpar', 'limpeza'],
+      [dias(e.ultima_checagem) <= 30, 'Checagem do sistema no último mês', quando(e.ultima_checagem), "irPara('saude')", 'Checar', 'checagem'],
+      [def ? (def.tempo_real || def.outros.length > 0) : false, 'Antivírus ligado', def ? (def.tempo_real ? 'Defender em tempo real' : def.outros.length ? def.outros.join(', ') : 'proteção em tempo real desligada') : 'não deu pra verificar', "irPara('saude')", 'Ver'],
+      [def ? (def.outros.length > 0 || def.idade_definicoes <= 3) : false, 'Antivírus atualizado', def ? (def.outros.length ? 'outro antivírus cuida disso' : `definições de ${def.idade_definicoes === 0 ? 'hoje' : 'há ' + def.idade_definicoes + ' dia(s)'}`) : '–', "acao('defender_atualizar')", 'Atualizar', 'antivirus'],
+      [discos.length > 0 && discos.every(d => d.saude === 'Healthy'), 'Discos saudáveis', discos.map(d => `${d.nome}: ${d.saude === 'Healthy' ? 'ok' : d.saude}`).join(', ') || '–', "irPara('saude')", 'Ver'],
+      [r.startup_ativos <= 8, 'Inicialização enxuta', `${r.startup_ativos} programas abrindo com o Windows`, "irPara('inicializacao')", 'Ajustar'],
+      [e.pendentes_programas === 0, 'Programas atualizados', e.pendentes_programas == null ? 'ainda não procurou' : `${e.pendentes_programas} com atualização`, "irPara('atualizacoes'); abrirAba('programas'); procurarProgramas()", 'Ver', 'programas'],
+      [e.pendentes_windows === 0, 'Windows atualizado', e.pendentes_windows == null ? 'ainda não procurou' : `${e.pendentes_windows} pendente(s)`, "irPara('atualizacoes'); abrirAba('windows'); procurarWU(false)", 'Ver', 'windows'],
+      [!r.reinicio, 'Sem reinicialização pendente', r.reinicio ? 'atualização esperando reiniciar' : 'tudo aplicado', 'reiniciar()', 'Reiniciar'],
+      [r.auto.ok && r.auto.dados.ativo, 'Manutenção automática', r.auto.ok && r.auto.dados.ativo ? `próxima: ${r.auto.dados.proxima || '–'}` : 'desligada', "irPara('automatico')", 'Ligar', 'automatico'],
+      [!problemas.length, 'Sem problemas no registro', problemas.length ? problemas.map(p => p.titulo).join(', ') : 'nenhum erro conhecido', "irPara('registro')", 'Resolver'],
+    ];
+    passosPendentes = [...new Set(itens.filter(i => !i[0] && i[5]).map(i => i[5]))];
+    $('#btnResolverTudo').hidden = !passosPendentes.length;
+    const ok = itens.filter(i => i[0]).length;
+    const nota = Math.round(ok / itens.length * 100);
+    const [rotulo, texto, cor] = nota === 100 ? ['PC estribado! 😎', 'Tudo em dia. É isso!', 'var(--acento)']
+      : nota >= 80 ? ['Quase estribado', 'Resolve os itens amarelos e fica 100%.', 'var(--acento)']
+      : nota >= 55 ? ['Precisando de um trato', 'Alguns cuidados estão atrasados.', 'var(--aviso)']
+      : ['Bora dar um trato!', 'Clica nos botões dos itens amarelos.', 'var(--perigo)'];
+    anel($('#anelNota'), nota, nota, 'de 100', cor);
+    $('#notaRotulo').textContent = rotulo;
+    $('#notaTexto').textContent = texto;
+    if (ocupado) travar(true);
+    const linhaChk = ([bom, titulo, sub, cmd, botao]) => `
+      <div class="chk ${bom ? 'ok' : 'ruim'}"><span class="bola">${bom ? '✓' : '!'}</span>
+        <div class="txt">${esc(titulo)}<small>${esc(sub)}</small></div>
+        ${bom ? '' : `<button class="btn sec" onclick="${cmd}">${botao}</button>`}</div>`;
+    // pendentes sempre à mostra; os que estão em dia ficam recolhidos pra o card não crescer demais
+    const bons = itens.filter(i => i[0]);
+    $('#checklist').innerHTML = itens.filter(i => !i[0]).map(linhaChk).join('') + (bons.length ? `
+      <div class="chk ok" style="cursor:pointer" onclick="this.nextElementSibling.hidden = !this.nextElementSibling.hidden">
+        <span class="bola">✓</span><div class="txt">${bons.length} ${bons.length === 1 ? 'item em dia' : 'itens em dia'}<small>clique pra ver</small></div></div>
+      <div ${bons.length === itens.length ? '' : 'hidden'}>${bons.map(linhaChk).join('')}</div>` : '');
+    $('#faixaReinicio').hidden = !r.reinicio;
+  } finally {
+    notaCarregando = false;
+  }
+}
+
+async function limpezaRapida() {
+  irPara('limpeza');
+  marcados.clear();
+  alvos.filter(a => a.padrao).forEach(a => marcados.add(a.id));
+  renderLimpeza();
+  if (await analisar()) limpar();
+}
+
+/* Resolver tudo: junta numa tarefa só os reparos automáticos dos itens pendentes */
+let passosPendentes = [];
+const PASSOS = {
+  limpeza: ['Limpeza', 'Temporários, cache do Windows Update, relatórios de erro e cache dos navegadores.'],
+  antivirus: ['Atualizar o antivírus', 'Baixa as definições mais novas.'],
+  checagem: ['Checagem do sistema (DISM + SFC)', 'A mais demorada: de 15 a 35 minutos.'],
+  programas: ['Atualizar os programas', 'Pelo winget. Alguns programas podem fechar enquanto atualizam.'],
+  windows: ['Instalar atualizações do Windows', 'Pode pedir pra reiniciar no final.'],
+  automatico: ['Ligar a manutenção automática', 'Toda sexta ao meio-dia (dá pra mudar depois em Automático).'],
+};
+async function resolverTudo() {
+  const ordem = ['limpeza', 'antivirus', 'automatico', 'programas', 'windows', 'checagem'].filter(p => passosPendentes.includes(p));
+  const html = `Escolhe o que fazer. Vai tudo numa tarefa só, e dá pra cancelar a qualquer momento.
+    <div class="passos" style="margin-top:12px">${ordem.map(p => `<label><input type="checkbox" class="check passo" value="${p}" checked>
+      <div>${PASSOS[p][0]}<small>${PASSOS[p][1]}</small></div></label>`).join('')}</div>`;
+  if (!await confirmar('Resolver tudo', html, 'Bora!')) return;
+  const escolhidos = [...$$('.passo:checked')].map(c => c.value);
+  if (!escolhidos.length) return;
+  iniciarTarefa(api().resolver_tudo(escolhidos));
+}
+
+/* ---------- Registro ---------- */
+async function carregarRegistro() {
+  const [problemas, linhas] = await Promise.all([api().problemas(), api().log_ler()]);
+  contador('#contProblemas', problemas.length);
+  $('#listaProblemasLog').innerHTML = problemas.length ? problemas.map(p => `<div class="problema">
+      <div class="ic">${icone('alerta')}</div>
+      <div class="txt"><b>${esc(p.titulo)}</b><p>${esc(p.explicacao)}</p><code title="${esc(p.exemplo)}">${esc(p.quando)} · ${esc(p.exemplo)}</code></div>
+      <button class="btn primario peq ${p.acao === 'reabrir_admin' ? '' : 'acao'}" onclick="acao('${p.acao}')">${esc(p.botao)}</button>
+    </div>`).join('') : vazio('Nenhum problema encontrado 😎', 'Quando alguma coisa der erro, ela aparece aqui com o botão pra resolver.');
+  if (ocupado) travar(true);
+  const visor = $('#visorLog');
+  visor.innerHTML = linhas.map(l => {
+    const m = l.match(/^\[(.+?)\] (.*)$/);
+    const [t, txt] = m ? [m[1], m[2]] : ['', l];
+    const classe = /^=====|^━━━/.test(txt) ? 'h' : /^✔|Pronto!|concluíd|Nenhum erro|não encontrou nenhuma/i.test(txt) ? 'ok'
+      : /^⚠|não deu|cancelad|aviso/i.test(txt) ? 'av' : /erro|falh|negad|ERROS/i.test(txt) ? 'er' : '';
+    return `<span class="${classe}"><span class="t">${esc(t.slice(0, 16))}</span>  ${esc(txt)}</span>`;
+  }).join('\n') || '<span class="t">Registro vazio.</span>';
+  visor.scrollTop = visor.scrollHeight;
+}
+async function copiarLog() {
+  await api().log_copiar();
+  toast('Registro copiado! É só colar onde quiser (Ctrl+V).');
+}
+async function limparLog() {
+  if (!await confirmar('Limpar o registro?', 'Apaga o histórico do que o programa fez. Os problemas já resolvidos somem da lista.', 'Limpar')) return;
+  await api().log_limpar();
+  carregarRegistro();
+  carregarNota();
+}
+
+/* ---------- Limpeza ---------- */
+const CORES = { Windows: ['#5b9cff', 'W'], Chrome: ['#f5b84a', 'C'], Edge: ['#38d9a9', 'E'] };
+const NAVEGADOR_EXE = { Chrome: 'chrome.exe', Edge: 'msedge.exe' };
+// itens de navegador aberto são pulados na limpeza, então não entram na conta
+const liberavel = id => analise[id] && !analise[id].aberto ? analise[id].bytes : 0;
+
+function renderLimpeza() {
+  const grupos = [...new Set(alvos.map(a => a.grupo))];
+  $('#gruposLimpeza').innerHTML = grupos.map(g => {
+    const itens = alvos.filter(a => a.grupo === g);
+    const [cor, letra] = CORES[g] || ['#8a97a8', g[0]];
+    const somaGrupo = itens.reduce((s, a) => s + (marcados.has(a.id) && analise[a.id] ? analise[a.id].bytes : 0), 0);
+    const aberto = itens.some(a => analise[a.id]?.aberto);
+    return `<div class="card grupo">
+      <div class="grupo-topo">
+        <div class="letra" style="background:${cor}22;color:${cor}">${letra}</div>
+        <h2>${esc(g)}</h2>
+        <span class="tam">${Object.keys(analise).length ? fmt(somaGrupo) : ''}</span>
+      </div>
+      ${aberto ? `<div class="aviso-nav">${icone('alerta')}O ${esc(g)} está aberto, então os arquivos dele vão ser pulados.
+        <button class="btn aviso peq acao" onclick="fecharNavegador('${g}')">Fechar ${esc(g)}</button></div>` : ''}
+      ${itens.map(a => {
+        const r = analise[a.id];
+        return `<label class="item">
+          <input type="checkbox" class="check" data-id="${a.id}" ${marcados.has(a.id) ? 'checked' : ''}>
+          <div class="txt"><b>${esc(a.nome)}</b><p>${esc(a.desc)}</p></div>
+          <span class="tam ${r && r.bytes > 0 ? 'cheio' : ''}">${r ? fmt(r.bytes) : '–'}</span>
+        </label>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+  $$('#gruposLimpeza .check').forEach(c => c.onchange = () => {
+    c.checked ? marcados.add(c.dataset.id) : marcados.delete(c.dataset.id);
+    renderLimpeza();
+  });
+  if (ocupado) travar(true);
+  atualizarResumo();
+}
+
+function atualizarResumo() {
+  if (!Object.keys(analise).length) return;
+  const sel = [...marcados].filter(id => analise[id]);
+  const total = sel.reduce((s, id) => s + liberavel(id), 0);
+  const arquivos = sel.reduce((s, id) => s + (analise[id].aberto ? 0 : analise[id].arquivos), 0);
+  const pulados = sel.filter(id => analise[id].aberto).reduce((s, id) => s + analise[id].bytes, 0);
+  $('#totalSel').textContent = fmt(total);
+  $('#totalTxt').innerHTML = `podem ser liberados em <b>${arquivos.toLocaleString('pt-BR')}</b> arquivos (${sel.length} itens marcados)` +
+    (pulados ? `<br>+ ${fmt(pulados)} se fechar o navegador` : '');
+}
+
+async function analisar() {
+  if (!marcados.size) { toast('Marque pelo menos um item.', true); return false; }
+  if (ocupado) { toast(`Espera terminar: ${tarefaAtual}`, true); return false; }
+  const btn = $('#btnAnalisar');
+  btn.innerHTML = '<div class="girando"></div>Analisando...';
+  travar(true);
+  $('#totalSel').textContent = '...';
+  $('#totalTxt').textContent = 'Somando os arquivos, pode levar uns segundos.';
+  try {
+    const r = await api().analisar(alvos.map(a => a.id));
+    analise = Object.fromEntries(r.map(x => [x.id, x]));
+    renderLimpeza();
+    return true;
+  } catch (e) {
+    toast('Erro ao analisar: ' + e, true);
+    return false;
+  } finally {
+    btn.innerHTML = icone('lupa') + 'Analisar';
+    travar(false);
+  }
+}
+
+async function limpar() {
+  if (!marcados.size) return toast('Marque pelo menos um item.', true);
+  const sel = [...marcados];
+  const total = sel.reduce((s, id) => s + liberavel(id), 0);
+  const perigosos = sel.filter(id => /cookies|lixeira|historico/.test(id)).map(id => alvos.find(a => a.id === id));
+  const alerta = perigosos.length ? `Inclui ${perigosos.map(a => `${a.nome} do ${a.grupo}`).join(', ')}. Isso não volta.` : '';
+  const ok = await confirmar('Confirmar limpeza',
+    `Vai limpar <b>${sel.length} itens</b>${total ? `, cerca de <b>${fmt(total)}</b>` : ''}. Arquivos em uso por algum programa são pulados automaticamente. Dá pra cancelar a qualquer momento.`,
+    'Limpar agora', alerta);
+  if (!ok) return;
+  iniciarTarefa(api().limpar(sel), ev => {
+    if (ev.ok && ev.resultado) toast(`Pronto! ${fmt(ev.resultado.total)} liberados.`);
+    analisar();
+  });
+}
+
+async function fecharNavegador(grupo) {
+  const ok = await confirmar(`Fechar o ${grupo}?`,
+    `Todas as janelas do ${grupo} vão ser fechadas. Quando abrir de novo, ele oferece restaurar as abas.`, `Fechar ${grupo}`);
+  if (!ok) return;
+  const r = await api().fechar_navegador(NAVEGADOR_EXE[grupo]);
+  toast(r.ok ? `${grupo} fechado.` : `Não deu pra fechar o ${grupo}.`, !r.ok);
+  analisar();
+}
+
+/* ---------- Saúde ---------- */
+function carregarSaude() { carregarDefender(); carregarDiscos(); }
+
+async function carregarDefender() {
+  const r = await api().defender_status();
+  if (!r.ok) { $('#defStatus').innerHTML = `<span class="pilula mal">Não deu pra ler o status: ${esc(r.erro)}</span>`; return; }
+  const d = r.dados;
+  const p = (classe, txt) => `<span class="pilula ${classe}">${txt}</span>`;
+  $('#defStatus').innerHTML = [
+    d.outros.length ? p('ok', `Antivírus: ${esc(d.outros.join(', '))}`) : '',
+    p(d.tempo_real ? 'ok' : (d.outros.length ? '' : 'mal'), d.tempo_real ? 'Proteção em tempo real ligada' : 'Defender em tempo real desligado'),
+    d.idade_definicoes != null ? p(d.idade_definicoes <= 3 ? 'ok' : 'ruim', `Definições de ${d.idade_definicoes === 0 ? 'hoje' : 'há ' + d.idade_definicoes + ' dia(s)'}`) : '',
+    d.dias_ultima_verificacao != null ? p(d.dias_ultima_verificacao <= 7 ? 'ok' : 'ruim', `Última verificação ${d.dias_ultima_verificacao === 0 ? 'hoje' : 'há ' + d.dias_ultima_verificacao + ' dia(s)'}`) : '',
+    p(d.ameacas ? 'mal' : 'ok', d.ameacas ? `${d.ameacas} ameaça(s) detectada(s)` : 'Nenhuma ameaça no histórico'),
+  ].join('');
+}
+
+async function carregarDiscos() {
+  const r = await api().discos_saude();
+  if (!r.ok) { $('#discosSaude').innerHTML = vazio('Não deu pra ler os discos', esc(r.erro)); return; }
+  $('#discosSaude').innerHTML = r.dados.map(d => {
+    const detalhes = [
+      d.temperatura ? `${d.temperatura} °C` : null,
+      d.desgaste != null ? `${d.desgaste}% de desgaste` : null,
+      d.horas_ligado ? `${Math.round(d.horas_ligado / 24)} dias ligado no total` : null,
+      d.erros_leitura ? `${d.erros_leitura} erros de leitura` : null,
+    ].filter(Boolean).join(' · ');
+    return `<div class="linha">
+      <div class="ic" style="color:var(--roxo)">${icone('disco')}</div>
+      <div class="txt"><b>${esc(d.nome)}</b><p>${esc(d.tipo === 'Unspecified' ? 'Disco' : d.tipo)} · ${fmt(d.tamanho)}${detalhes ? ' · ' + detalhes : ''}</p></div>
+      <span class="tag ${d.saude === 'Healthy' ? 'verde' : 'vermelho'}">${d.saude === 'Healthy' ? 'Saudável' : esc(d.saude)}</span>
+    </div>`;
+  }).join('') || vazio('Nenhum disco encontrado', '');
+}
+
+/* ---------- Atualizações ---------- */
+function contador(id, n) { $(id).hidden = !n; $(id).textContent = n; }
+async function comBotao(btn, promessa) {
+  const antes = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<div class="girando"></div>Procurando...';
+  try { return await promessa; } finally { btn.disabled = false; btn.innerHTML = antes; }
+}
+
+async function procurarProgramas() {
+  $('#listaWinget').innerHTML = carregando('Procurando atualizações dos programas...');
+  $('#btnWgTodos').hidden = true;
+  const r = await comBotao($('#btnWgProcurar'), api().winget_listar());
+  if (!r.ok) { $('#listaWinget').innerHTML = vazio('Não deu pra consultar o winget', esc(r.erro)); return; }
+  contador('#contProg', r.dados.length);
+  if (!r.dados.length) { $('#listaWinget').innerHTML = vazio('Tudo atualizado!', 'Nenhum programa com atualização pendente.'); return; }
+  $('#btnWgTodos').hidden = false;
+  $('#listaWinget').innerHTML = r.dados.map(p => `<div class="linha">
+      <div class="txt"><b>${esc(p.nome)}</b><p>${esc(p.id)}</p></div>
+      <span class="versao">${esc(p.versao)} → <em>${esc(p.disponivel)}</em></span>
+      <button class="btn sec peq acao" data-id="${esc(p.id)}">Atualizar</button>
+    </div>`).join('');
+  $$('#listaWinget button[data-id]').forEach(b => b.onclick = () => atualizarPrograma(b.dataset.id));
+  if (ocupado) travar(true);
+}
+
+async function atualizarPrograma(id) {
+  if (!id && !await confirmar('Atualizar todos?', 'Vai atualizar todos os programas da lista. Alguns podem fechar enquanto atualizam.', 'Atualizar todos')) return;
+  iniciarTarefa(api().winget_atualizar(id), () => procurarProgramas());
+}
+
+async function procurarWU(drivers) {
+  const [lista, rodape, btn] = drivers ? ['#listaDrvWU', '#rodapeDrvWU', '#btnDrvProcurar'] : ['#listaWU', '#rodapeWU', '#btnWinProcurar'];
+  $(lista).innerHTML = carregando(drivers ? 'Procurando drivers novos no catálogo da Microsoft...' : 'Consultando o Windows Update, pode levar 1 ou 2 minutos...');
+  $(rodape).hidden = true;
+  const r = await comBotao($(btn), api().wu_buscar(drivers));
+  if (!r.ok) { $(lista).innerHTML = vazio('Não deu pra consultar o Windows Update', esc(r.erro)); return; }
+  listasWU[drivers] = r.dados;
+  contador(drivers ? '#contDrv' : '#contWin', r.dados.length);
+  if (drivers) { driversVerificados = true; renderDrivers(); }
+  if (!r.dados.length) {
+    $(lista).innerHTML = drivers
+      ? vazio('Nenhum driver novo no catálogo', 'Seus drivers estão na versão mais nova que a Microsoft distribui.')
+      : vazio('Windows em dia!', 'Nenhuma atualização pendente.');
+    return;
+  }
+  $(rodape).hidden = false;
+  $(lista).innerHTML = r.dados.map((u, i) => `<label class="linha" style="cursor:pointer">
+      <input type="checkbox" class="check wu-${drivers}" data-i="${i}" checked>
+      <div class="txt"><b title="${esc(u.titulo)}">${esc(u.titulo)}</b>
+        <p>${[u.fabricante, u.data && 'versão de ' + u.data, u.tamanho ? fmt(u.tamanho) : null].filter(Boolean).map(esc).join(' · ')}</p></div>
+      <span class="tag ${u.driver ? 'azul' : 'cinza'}">${u.driver ? esc(u.classe || 'Driver') : 'Windows'}</span>
+    </label>`).join('');
+}
+
+async function instalarWU(drivers) {
+  const ids = [...$$(`.wu-${drivers}:checked`)].map(c => listasWU[drivers][c.dataset.i].id);
+  if (!ids.length) return toast('Selecione pelo menos um item.', true);
+  const ok = await confirmar(drivers ? 'Instalar drivers?' : 'Instalar atualizações?',
+    `Vai baixar e instalar <b>${ids.length}</b> item(ns). Pode demorar, e alguns pedem reinicialização no final.`, 'Instalar');
+  const ponto = $(drivers ? '#drvPonto' : '#wuPonto').checked;
+  if (ok) iniciarTarefa(api().wu_instalar(ids, ponto), () => { procurarWU(drivers); if (drivers) carregarDrivers(); });
+}
+
+async function carregarHistorico() {
+  const r = await api().wu_historico();
+  if (!r.ok) { $('#listaHistorico').innerHTML = vazio('Não deu pra ler o histórico', esc(r.erro)); return; }
+  const res = { 2: ['verde', 'OK'], 3: ['amarelo', 'Com avisos'], 4: ['vermelho', 'Falhou'], 5: ['cinza', 'Cancelada'] };
+  $('#listaHistorico').innerHTML = r.dados.map(h => {
+    const [cor, txt] = res[h.resultado] || ['cinza', 'Em andamento'];
+    return `<div class="linha"><div class="txt"><b title="${esc(h.titulo)}">${esc(h.titulo)}</b><p>${esc(h.data)}</p></div><span class="tag ${cor}">${txt}</span></div>`;
+  }).join('') || vazio('Sem histórico', '');
+}
+
+async function carregarDrivers() {
+  $('#listaProblemas').innerHTML = carregando('Verificando dispositivos...');
+  $('#listaDrivers').innerHTML = carregando('Lendo drivers...');
+  const [p, d] = await Promise.all([api().drivers_problemas(), api().drivers_principais()]);
+  $('#listaProblemas').innerHTML = !p.ok ? vazio('Não deu pra verificar', esc(p.erro))
+    : !p.dados.length ? vazio('Tudo funcionando!', 'Nenhum dispositivo com problema.')
+    : p.dados.map(x => `<div class="linha"><div class="ic" style="color:var(--aviso)">${icone('alerta')}</div>
+        <div class="txt"><b>${esc(x.nome)}</b><p>${esc(x.problema)}</p></div><span class="tag ${x.codigo === 22 ? 'cinza' : 'amarelo'}">${esc(x.classe || 'Dispositivo')}</span></div>`).join('')
+      + '<div class="linha"><p class="sub" style="font-size:13px">Dica: clique em <b>Procurar drivers</b> e em <b>Detectar hardware</b> lá em cima. Isso costuma resolver a maioria desses casos.</p></div>';
+  if (!d.ok) { $('#listaDrivers').innerHTML = vazio('Não deu pra ler os drivers', esc(d.erro)); return; }
+  driversLista = d.dados;
+  renderDrivers();
+}
+
+/* cada driver instalado é ligado à atualização do catálogo pelo ID de hardware */
+let driversLista = [];
+let driversVerificados = false;
+const mesmoHardware = (a, b) => a && b && (a.toLowerCase().startsWith(b.toLowerCase()) || b.toLowerCase().startsWith(a.toLowerCase()));
+function atualizacaoDo(driver) { return listasWU[true].find(u => mesmoHardware(u.hwid, driver.hwid)); }
+
+function renderDrivers() {
+  const classes = { DISPLAY: 'Vídeo', NET: 'Rede', MEDIA: 'Som', BLUETOOTH: 'Bluetooth', HDC: 'Armazenamento', SCSIADAPTER: 'Armazenamento' };
+  const hoje = Date.now();
+  $('#btnDrvTodos').hidden = !listasWU[true].length;
+  $('#listaDrivers').innerHTML = driversLista.map((x, i) => {
+    const anos = x.data ? (hoje - new Date(x.data)) / 31557600000 : null;
+    const antigo = anos != null && anos > 3;
+    const nova = atualizacaoDo(x);
+    let status = '';
+    if (nova) {
+      status = `<span class="tag verde">Nova versão${nova.data ? ' de ' + esc(nova.data) : ''}</span>
+        <button class="btn primario peq acao" onclick="atualizarDriver(${i})">Atualizar</button>`;
+    } else if (driversVerificados && antigo) {
+      status = `<span class="tag amarelo" title="O catálogo da Microsoft não tem versão mais nova desse driver">Antigo (${Math.floor(anos)} anos)</span>
+        <button class="btn sec peq" onclick="api().pesquisar_driver(driversLista[${i}].nome)" title="Abre a busca do driver no navegador">Buscar no fabricante</button>`;
+    } else if (driversVerificados) {
+      status = '<span class="tag verde">Em dia</span>';
+    } else if (antigo) {
+      status = `<span class="tag amarelo">Antigo (${Math.floor(anos)} anos)</span>`;
+    }
+    return `<div class="linha"><div class="ic" style="color:var(--azul)">${icone('chip')}</div>
+      <div class="txt"><b>${esc(x.nome)}</b><p>${esc(x.fabricante)} · versão ${esc(x.versao)}${x.data ? ' · ' + x.data.split('-').reverse().join('/') : ''}</p></div>
+      <span class="tag cinza">${classes[x.classe] || esc(x.classe)}</span>${status}</div>`;
+  }).join('') + (driversVerificados && driversLista.some(x => !atualizacaoDo(x) && x.data && (hoje - new Date(x.data)) / 31557600000 > 3)
+    ? '<div class="linha"><p class="sub" style="font-size:13px">Drivers antigos sem versão no catálogo da Microsoft só são atualizados pelo site do fabricante (ou da sua placa-mãe). É o único jeito oficial e seguro.</p></div>' : '');
+  if (ocupado) travar(true);
+}
+
+async function atualizarDriver(i) {
+  const nova = atualizacaoDo(driversLista[i]);
+  if (!nova || !await confirmar('Atualizar driver?', `Vai instalar <b>${esc(nova.titulo)}</b>. A tela pode piscar ou a conexão cair por alguns segundos.`, 'Atualizar')) return;
+  iniciarTarefa(api().wu_instalar([nova.id], true), () => { carregarDrivers(); procurarWU(true); });
+}
+
+async function atualizarTodosDrivers() {
+  const n = listasWU[true].length;
+  if (!n || !await confirmar('Atualizar todos os drivers?', `Vai instalar <b>${n}</b> driver(s) novo(s), criando um ponto de restauração antes.`, 'Atualizar todos')) return;
+  iniciarTarefa(api().wu_instalar(listasWU[true].map(u => u.id), true), () => { carregarDrivers(); procurarWU(true); });
+}
+
+/* ---------- Inicialização ---------- */
+async function carregarStartup() {
+  $('#listaStartup').innerHTML = carregando('Carregando...');
+  const itens = await api().startup_listar();
+  if (!itens.length) { $('#listaStartup').innerHTML = vazio('Nada abrindo com o Windows', 'Seu boot já tá limpinho.'); return; }
+  const ativos = itens.filter(i => i.ativo).length;
+  $('#listaStartup').innerHTML = `<div class="secao-topo"><div><h2>${ativos} de ${itens.length} ativos</h2>
+      <p>Cada programa ativo aqui deixa o boot um pouco mais lento. O ideal é até 8.</p></div></div>` +
+    itens.map(i => `<div class="linha">
+      <div class="txt"><b>${esc(i.nome)}</b><p title="${esc(i.comando)}">${esc(i.local)} · ${esc(i.comando)}</p></div>
+      ${i.precisa_admin ? '<span class="tag amarelo">Admin</span>' : ''}
+      <label class="chave"><input type="checkbox" data-id="${esc(i.id)}" ${i.ativo ? 'checked' : ''}><span></span></label>
+    </div>`).join('');
+  $$('#listaStartup .chave input').forEach(c => c.onchange = async () => {
+    c.disabled = true;
+    const r = await api().startup_definir(c.dataset.id, c.checked);
+    c.disabled = false;
+    if (!r.ok) { c.checked = !c.checked; return toast(r.erro, true); }
+    const nome = c.closest('.linha').querySelector('b').textContent;
+    toast(`${nome} ${c.checked ? 'vai abrir' : 'não vai mais abrir'} com o Windows.`);
+    const n = $$('#listaStartup .chave input:checked').length;
+    $('#listaStartup h2').textContent = `${n} de ${itens.length} ativos`;
+  });
+}
+
+/* ---------- Automático ---------- */
+function mostrarAuto(s) {
+  $('#autoChave').checked = s.ativo;
+  $('#autoDia').value = s.dia;
+  $('#autoHora').value = s.hora;
+  $('#autoTitulo').textContent = s.ativo ? 'Ligada 😎' : 'Desligada';
+  $('#autoTexto').textContent = s.ativo
+    ? `Próxima: ${s.proxima || '–'}${s.ultima ? ` · Última: ${s.ultima}` : ''}`
+    : 'Liga aqui e escolhe o dia e a hora.';
+  $('#autoSalvar').hidden = true;
+}
+async function carregarAuto() {
+  const r = await api().auto_status();
+  if (r.ok) mostrarAuto(r.dados); else toast(r.erro, true);
+}
+$('#autoChave').onchange = async () => {
+  const c = $('#autoChave');
+  c.disabled = true;
+  const r = c.checked ? await api().auto_ativar($('#autoDia').value, $('#autoHora').value) : await api().auto_desativar();
+  c.disabled = false;
+  if (!r.ok) { c.checked = !c.checked; return toast(r.erro, true); }
+  mostrarAuto(r.dados);
+  toast(r.dados.ativo ? 'Manutenção automática ligada!' : 'Manutenção automática desligada.');
+};
+['#autoDia', '#autoHora'].forEach(s => $(s).onchange = () => { $('#autoSalvar').hidden = !$('#autoChave').checked; });
+async function salvarAuto() {
+  const r = await api().auto_ativar($('#autoDia').value, $('#autoHora').value);
+  if (!r.ok) return toast(r.erro, true);
+  mostrarAuto(r.dados);
+  toast('Horário salvo.');
+}
+
+/* ---------- Atualização do próprio programa ---------- */
+let attInfo = null;
+async function verificarAtualizacao(automatico) {
+  if (!automatico) { $('#attTitulo').textContent = 'Procurando...'; $('#attTexto').textContent = 'Conferindo a última versão publicada.'; }
+  const pedido = api().atualizacao_verificar(automatico);
+  const r = automatico ? await pedido : await comBotao($('#btnAttVerificar'), pedido);
+  if (!r.ok) {
+    if (!automatico) { $('#attTitulo').textContent = 'Não deu pra verificar'; $('#attTexto').textContent = r.erro + ' Confere a internet e tenta de novo.'; }
+    return;
+  }
+  const d = r.dados;
+  $('#attAuto').checked = d.auto;
+  if (!d.configurado) {
+    $('#attTitulo').textContent = 'Atualização automática ainda não configurada';
+    $('#attTexto').textContent = 'Essa cópia do programa não tem um endereço de atualização definido.';
+  } else if (d.nova) {
+    attInfo = d;
+    $('#attTitulo').textContent = `Versão ${d.versao} disponível! 🎉`;
+    $('#attTexto').textContent = [d.publicado && 'Publicada em ' + d.publicado.split('-').reverse().join('/'), d.tamanho && fmt(d.tamanho), `você está na ${info.versao}`].filter(Boolean).join(' · ');
+    $('#attNotas').textContent = d.notas ? 'Novidades:\n' + d.notas : '';
+    $('#attNotas').hidden = !d.notas;
+    $('#btnAttInstalar').hidden = false;
+    $('#faixaAttVersao').textContent = d.versao;
+    $('#faixaAtualizacao').hidden = false;
+    $('#infoPc .ponto-novo') || $('#infoPc b').insertAdjacentHTML('beforeend', '<span class="ponto-novo" title="Versão nova disponível"></span>');
+  } else if (!d.pulado) {
+    $('#attTitulo').textContent = 'Você está na versão mais nova 😎';
+    $('#attTexto').textContent = `Versão ${info.versao}. Verificado agora há pouco.`;
+  }
+  if (ocupado) travar(true);
+}
+async function instalarAtualizacao() {
+  if (!attInfo) return verificarAtualizacao(false);
+  const ok = await confirmar(`Atualizar para a ${attInfo.versao}?`,
+    `Vai baixar a versão nova${attInfo.tamanho ? ` (${fmt(attInfo.tamanho)})` : ''}, conferir se é o arquivo original e instalar. O PC Estribado fecha e abre de novo sozinho.`,
+    'Atualizar agora');
+  if (ok) iniciarTarefa(api().atualizacao_instalar());
+}
+$('#attAuto').onchange = () => api().atualizacao_config($('#attAuto').checked);
+
+/* ---------- Partida ---------- */
+function etapaSplash(frase, pct) {
+  $('#splashFrase').textContent = frase;
+  $('#splashBarra').style.width = pct + '%';
+}
+function fecharSplash() { $('#splash').classList.add('saindo'); }
+
+async function iniciar() {
+  setTimeout(fecharSplash, 15000);  // nunca prende a pessoa na tela de carregamento
+  etapaSplash('Botando os óculos escuros...', 20);
+  await carregarInfo();
+  etapaSplash('Lendo o hardware...', 45);
+  const hw = carregarHardware();
+  atualizarMetricas();
+  setInterval(atualizarMetricas, 2000);
+  alvos = await api().alvos();
+  alvos.filter(a => a.padrao).forEach(a => marcados.add(a.id));
+  renderLimpeza();
+  etapaSplash('Calculando a nota de saúde...', 70);
+  await carregarNota();
+  etapaSplash('Pegando a vassoura...', 90);
+  await hw;
+  etapaSplash('Bora!', 100);
+  setTimeout(fecharSplash, 350);
+  $('#sobreVersao').textContent = `versão ${info.versao} · leve, liso e sem travar`;
+  verificarAtualizacao(true);
+}
+if (window.pywebview?.api) iniciar();
+else window.addEventListener('pywebviewready', iniciar);
+</script>
+</body>
+</html>
